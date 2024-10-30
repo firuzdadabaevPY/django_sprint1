@@ -1,8 +1,9 @@
 from django.shortcuts import render
+from typing import List, Dict, Union
+from django.http import Http404
 
-# Create your views here.
 
-posts = [
+posts: List[Dict[str, Union[int, str]]] = [
     {
         'id': 0,
         'location': 'Остров отчаянья',
@@ -45,6 +46,8 @@ posts = [
     },
 ]
 
+posts_dict = {post['id']: post for post in posts}
+
 
 def index(request):
     template = 'blog/index.html'
@@ -52,9 +55,12 @@ def index(request):
     return render(request, template, context)
 
 
-def post_detail(request, id):
+def post_detail(request, post_id):
     template = 'blog/detail.html'
-    context = {'post': posts[id]}
+    if post_id not in posts_dict:
+        raise Http404('Not found')
+
+    context = {'post': posts_dict[post_id]}
     return render(request, template, context)
 
 
